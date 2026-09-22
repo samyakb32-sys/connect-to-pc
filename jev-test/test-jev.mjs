@@ -2,7 +2,6 @@
 // Prereqs:
 //   1. npm install ai
 //   2. export AI_GATEWAY_API_KEY=your_key_from_vercel_dashboard
-//   3. Confirm "typesafe/jev" is actually listed in your Vercel AI Gateway model catalog
 
 import { generateObject } from 'ai';
 import { z } from 'zod';
@@ -12,7 +11,7 @@ const state = {
 };
 
 const result = await generateObject({
-  model: 'typesafe/jev',
+  model: 'typesafe-ai/jev',
   schema: z.object({
     category: z.enum(['bug', 'billing', 'feature_request', 'other']),
     urgency: z.number().min(0).max(1),
