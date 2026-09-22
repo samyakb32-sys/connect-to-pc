@@ -1,0 +1,243 @@
+<title>Jev Routing Layer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --bg: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #eeece5;
+    --ink: #17181a;
+    --ink-dim: #55585e;
+    --line: #d8d5cb;
+    --accent: #c9721c;
+    --accent-ink: #ffffff;
+    --fast: #2f7a5c;
+    --complex: #8a4fb0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14151a;
+      --surface: #1c1e24;
+      --surface-2: #23252c;
+      --ink: #ececea;
+      --ink-dim: #a4a7ae;
+      --line: #33363f;
+      --accent: #e08a3c;
+      --accent-ink: #14151a;
+      --fast: #4bbf90;
+      --complex: #b487e0;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14151a;
+    --surface: #1c1e24;
+    --surface-2: #23252c;
+    --ink: #ececea;
+    --ink-dim: #a4a7ae;
+    --line: #33363f;
+    --accent: #e08a3c;
+    --accent-ink: #14151a;
+    --fast: #4bbf90;
+    --complex: #b487e0;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    padding-inline: 20px;
+    padding-block: 32px 48px;
+    max-width: 880px;
+    margin: 0 auto;
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 8px;
+  }
+  h1 {
+    font-size: clamp(26px, 5vw, 38px);
+    line-height: 1.15;
+    margin: 0 0 12px;
+    text-wrap: balance;
+  }
+  .lede {
+    color: var(--ink-dim);
+    font-size: 16px;
+    line-height: 1.55;
+    max-width: 62ch;
+    margin: 0 0 36px;
+  }
+  .lede b { color: var(--ink); font-weight: 600; }
+
+  figure {
+    margin: 0 0 40px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 16px 14px;
+  }
+  figure svg { display: block; width: 100%; height: auto; }
+  figcaption {
+    font-size: 13px;
+    color: var(--ink-dim);
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  .paths {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  @media (max-width: 560px) {
+    .paths { grid-template-columns: 1fr; }
+  }
+  .path-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 18px 20px;
+  }
+  .path-card .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  .path-card.fast .tag { background: color-mix(in srgb, var(--fast) 18%, transparent); color: var(--fast); }
+  .path-card.complex .tag { background: color-mix(in srgb, var(--complex) 18%, transparent); color: var(--complex); }
+  .path-card h3 { margin: 0 0 6px; font-size: 17px; }
+  .path-card p { margin: 0 0 10px; color: var(--ink-dim); font-size: 14px; line-height: 1.5; }
+  .path-card ul { margin: 0; padding-left: 18px; color: var(--ink-dim); font-size: 13.5px; line-height: 1.7; }
+  .path-card ul li b { color: var(--ink); font-weight: 600; }
+  .path-card .latency {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-top: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .path-card .latency span { font-size: 12px; color: var(--ink-dim); font-weight: 400; font-family: 'IBM Plex Sans', sans-serif; }
+
+  .note {
+    background: var(--surface-2);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-dim);
+  }
+  .note b { color: var(--ink); font-weight: 600; }
+</style>
+
+<p class="eyebrow">Orchestration pattern</p>
+<h1>Jev as a fast decision layer</h1>
+<p class="lede">
+  Every incoming task hits <b>Jev</b> first. It answers a typed question — routine or complex? —
+  in under 500ms. Routine work executes immediately; only tasks that need real reasoning
+  pay the cost of a full LLM call.
+</p>
+
+<figure role="img" aria-label="Flow diagram: a task enters an orchestrator, which sends state and a routing question to Jev. Jev returns a typed decision with confidence. If the decision is 'simple', the orchestrator executes the action directly. If 'complex', the orchestrator calls a large model such as Claude via API, which reasons and returns a plan, which the orchestrator then executes.">
+  <svg viewBox="0 0 820 380" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+      </marker>
+    </defs>
+
+    <!-- Task input -->
+    <rect x="20" y="150" width="110" height="60" rx="10" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    <text x="75" y="176" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="currentColor">Task /</text>
+    <text x="75" y="192" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="currentColor">user intent</text>
+
+    <!-- Orchestrator -->
+    <rect x="180" y="140" width="130" height="80" rx="10" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    <text x="245" y="176" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-weight="600" font-size="13" fill="currentColor">Orchestrator</text>
+    <text x="245" y="194" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.7">holds app state</text>
+
+    <line x1="130" y1="180" x2="178" y2="180" stroke="currentColor" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <!-- Jev -->
+    <rect x="355" y="130" width="150" height="100" rx="10" fill="none" stroke="var(--accent)" stroke-width="2"/>
+    <text x="430" y="164" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-weight="700" font-size="15" fill="var(--accent)">Jev</text>
+    <text x="430" y="182" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.75">state + questions</text>
+    <text x="430" y="197" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity="0.75">→ typed decision</text>
+    <text x="430" y="216" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--accent)">~70–500ms</text>
+
+    <line x1="310" y1="180" x2="353" y2="180" stroke="currentColor" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="332" y="172" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.6">route?</text>
+
+    <!-- Fast path -->
+    <line x1="430" y1="130" x2="430" y2="80" stroke="var(--fast)" stroke-width="1.5"/>
+    <line x1="430" y1="80" x2="620" y2="80" stroke="var(--fast)" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="525" y="70" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--fast)">simple → execute now</text>
+
+    <rect x="620" y="45" width="160" height="70" rx="10" fill="none" stroke="var(--fast)" stroke-width="1.5"/>
+    <text x="700" y="75" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-weight="600" font-size="12.5" fill="var(--fast)">Action executed</text>
+    <text x="700" y="92" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.65">no LLM call</text>
+
+    <!-- Complex path -->
+    <line x1="430" y1="230" x2="430" y2="290" stroke="var(--complex)" stroke-width="1.5"/>
+    <line x1="430" y1="290" x2="620" y2="290" stroke="var(--complex)" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="525" y="280" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--complex)">complex → escalate</text>
+
+    <rect x="620" y="255" width="160" height="70" rx="10" fill="none" stroke="var(--complex)" stroke-width="1.5"/>
+    <text x="700" y="280" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-weight="600" font-size="12.5" fill="var(--complex)">Claude / GPT</text>
+    <text x="700" y="297" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity="0.65">via API, reasons + plans</text>
+
+    <!-- back to orchestrator -->
+    <path d="M700,255 C700,180 500,180 500,180" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 4" opacity="0.55" marker-end="url(#arrow)"/>
+    <text x="605" y="205" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="currentColor" opacity="0.55">plan returned, executed</text>
+  </svg>
+  <figcaption>
+    The orchestrator never calls a big model directly — it asks Jev first. Only the branch
+    Jev marks <b style="color:var(--complex)">complex</b> pays for a full reasoning call; everything
+    marked <b style="color:var(--fast)">simple</b> executes on the spot.
+  </figcaption>
+</figure>
+
+<div class="paths">
+  <div class="path-card fast">
+    <span class="tag">● Fast path</span>
+    <h3>Routine decisions</h3>
+    <p>Jev classifies and scores directly — the orchestrator acts on the typed result with no further model call.</p>
+    <ul>
+      <li><b>Examples:</b> intent routing, tool selection, cached-answer lookup, simple validation</li>
+      <li><b>Cost:</b> $0.042 / M input tokens, output free</li>
+    </ul>
+    <div class="latency">70–500<span>ms</span></div>
+  </div>
+  <div class="path-card complex">
+    <span class="tag">● Complex path</span>
+    <h3>Escalated reasoning</h3>
+    <p>Jev flags the task as needing generation or multi-step reasoning, so the orchestrator hands it to a full LLM.</p>
+    <ul>
+      <li><b>Examples:</b> writing code, drafting text, open-ended planning, ambiguous requests</li>
+      <li><b>Cost:</b> full model pricing — this is where it belongs</li>
+    </ul>
+    <div class="latency">seconds<span> to tens of seconds</span></div>
+  </div>
+</div>
+
+<div class="note">
+  <b>What Jev doesn't do:</b> it never generates the action or the content itself — only the
+  routing decision. The browser-opening, code-writing, or reply-drafting still happens in the
+  fast path's direct-execute step or in the complex path's model call. Jev's job is to keep the
+  expensive call from firing on every single decision the agent makes.
+</div>
