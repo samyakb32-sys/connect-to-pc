@@ -1,0 +1,44 @@
+# Copy to config.yaml and edit.
+
+# laya       -> run Laya inside this process (pip install laya; ~1 GB download on first run)
+# laya-http  -> call a running `laya-serve` at laya_url
+# heuristic  -> keyword rules, no model (to try the pipeline quickly)
+classifier: laya
+laya_url: http://localhost:8000
+laya_device: null        # null = auto, or "cpu" / "cuda"
+
+# If Laya's confidence is below this, send the request one tier up (safer, slower).
+min_confidence: 0.6
+# If the easy/medium model replies "I'm not sure..." (or nothing), retry one tier up.
+escalate_on_unsure_reply: true
+
+# Any OpenAI-compatible server works: Ollama, vLLM, llama.cpp, LM Studio...
+# A missing tier falls through to the next stronger one, so two entries are enough.
+# Model names below are examples; use whatever you have pulled/served.
+backends:
+  easy:
+    base_url: http://localhost:11434/v1     # Ollama
+    model: qwen3:4b
+    max_tokens: 512
+  medium:
+    base_url: http://localhost:11434/v1
+    model: qwen3:32b
+    max_tokens: 1024
+  hard:
+    base_url: http://localhost:11434/v1
+    model: qwen3:32b
+    max_tokens: 8192
+    timeout_s: 900
+
+# Same big model with thinking off for "medium" and on for "hard" is the best
+# setup. How you switch thinking depends on the server, via extra_body, e.g. vLLM
+# serving a Qwen3 model:
+#
+#   medium:
+#     base_url: http://localhost:8001/v1
+#     model: Qwen/Qwen3-32B-AWQ
+#     extra_body: {chat_template_kwargs: {enable_thinking: false}}
+#   hard:
+#     base_url: http://localhost:8001/v1
+#     model: Qwen/Qwen3-32B-AWQ
+#     extra_body: {chat_template_kwargs: {enable_thinking: true}}

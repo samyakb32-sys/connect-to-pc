@@ -1,0 +1,20 @@
+{"prompt": "hi, how are you?", "tier": "easy"}
+{"prompt": "What is the capital of Japan?", "tier": "easy"}
+{"prompt": "Convert 5 miles to kilometers", "tier": "easy"}
+{"prompt": "Fix the grammar: me and him goes to school everyday", "tier": "easy"}
+{"prompt": "What day comes after Wednesday?", "tier": "easy"}
+{"prompt": "Thanks, that helped!", "tier": "easy"}
+{"prompt": "Give me a synonym for happy", "tier": "easy"}
+{"prompt": "Write a polite email to my manager asking for leave on Friday", "tier": "medium"}
+{"prompt": "Summarize the main idea of photosynthesis in 3 lines", "tier": "medium"}
+{"prompt": "Explain what an API is to a 10 year old", "tier": "medium"}
+{"prompt": "Translate 'where is the railway station' into Hindi and French", "tier": "medium"}
+{"prompt": "Write a Python function that checks if a string is a palindrome", "tier": "medium"}
+{"prompt": "Draft a WhatsApp message inviting friends to my birthday on Saturday", "tier": "medium"}
+{"prompt": "Plan a 3-day Goa trip for two people under 15000 rupees with a day-by-day itinerary", "tier": "hard"}
+{"prompt": "A train leaves at 9:40 at 72 km/h, another leaves the same station at 10:15 at 90 km/h on the same track. When and where does the second catch up?", "tier": "hard"}
+{"prompt": "Design a database schema for a multi-tenant SaaS app with role-based access control", "tier": "hard"}
+{"prompt": "My React app re-renders infinitely when I set state inside useEffect. Debug it and explain the fix.", "tier": "hard"}
+{"prompt": "Compare renting vs buying a flat in Pune over 10 years, with the assumptions and the math", "tier": "hard"}
+{"prompt": "Prove that the square root of 2 is irrational", "tier": "hard"}
+{"prompt": "I have 3 job offers with different salaries, growth and locations. Help me build a decision framework and pick one.", "tier": "hard"}
